@@ -97,3 +97,10 @@ func getDNSSettings(nwCfg *cni.NetworkConfig, result *cniTypesCurr.Result, names
 
 	return dns, nil
 }
+
+func updateSubnetPrefix(cnsNetworkConfig *cns.GetNetworkContainerResponse, subnetPrefix *net.IPNet) {
+}
+
+func getNetworkName(podName, podNs, ifName string, nwCfg *cni.NetworkConfig) (string, error) {
+	return nwCfg.Name, nil
+}
