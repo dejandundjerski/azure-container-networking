@@ -46,6 +46,7 @@ type network struct {
 
 // NetworkInfo contains read-only information about a container network.
 type NetworkInfo struct {
+	MasterIfName     string
 	Id               string
 	Mode             string
 	Subnets          []SubnetInfo
@@ -121,6 +122,17 @@ func (nm *networkManager) findExternalInterfaceBySubnet(subnet string) *external
 	return nil
 }
 
+// FindExternalInterfaceByName finds an external interface by name.
+func (nm *networkManager) findExternalInterfaceByName(name string) *externalInterface {
+	for _, extIf := range nm.ExternalInterfaces {
+		if extIf != nil && extIf.Name == name {
+			return extIf
+		}
+	}
+
+	return nil
+}
+
 // NewNetwork creates a new container network.
 func (nm *networkManager) newNetwork(nwInfo *NetworkInfo) (*network, error) {
 	var nw *network
@@ -138,8 +150,8 @@ func (nm *networkManager) newNetwork(nwInfo *NetworkInfo) (*network, error) {
 		nwInfo.Mode = opModeDefault
 	}
 
-	// Find the external interface for this subnet.
-	extIf := nm.findExternalInterfaceBySubnet(nwInfo.Subnets[0].Prefix.String())
+	// Find the external interface by name.
+	extIf := nm.findExternalInterfaceByName(nwInfo.MasterIfName)
 	if extIf == nil {
 		err = errSubnetNotFound
 		return nil, err
