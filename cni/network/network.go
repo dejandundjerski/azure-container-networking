@@ -283,10 +283,12 @@ func (plugin *netPlugin) Add(args *cniSkel.CmdArgs) error {
 			resultConsAdd, errConsAdd := handleConsecutiveAdd(args.ContainerID, endpointId, nwInfo, nwCfg)
 			if errConsAdd != nil {
 				log.Printf("handleConsecutiveAdd failed with error %v", errConsAdd)
+				result = resultConsAdd
 				return errConsAdd
 			}
 
 			if resultConsAdd != nil {
+				result = resultConsAdd
 				return nil
 			}
 		}

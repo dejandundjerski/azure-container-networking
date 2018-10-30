@@ -123,11 +123,10 @@ func (nm *networkManager) findExternalInterfaceBySubnet(subnet string) *external
 }
 
 // FindExternalInterfaceByName finds an external interface by name.
-func (nm *networkManager) findExternalInterfaceByName(name string) *externalInterface {
-	for _, extIf := range nm.ExternalInterfaces {
-		if extIf != nil && extIf.Name == name {
-			return extIf
-		}
+func (nm *networkManager) findExternalInterfaceByName(ifName string) *externalInterface {
+	extIf, exists := nm.ExternalInterfaces[ifName]
+	if exists && extIf != nil {
+		return extIf
 	}
 
 	return nil
