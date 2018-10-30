@@ -77,9 +77,11 @@ func (nw *network) newEndpointImpl(epInfo *EndpointInfo) (*endpoint, error) {
 		outBoundNatPolicy.Exceptions = append(outBoundNatPolicy.Exceptions, ipAddress)
 	}
 
-	if cnetAddressSpace := epInfo.Data[CnetAddressSpace].([]string); cnetAddressSpace != nil {
-		for _, ipAddress := range cnetAddressSpace {
-			outBoundNatPolicy.Exceptions = append(outBoundNatPolicy.Exceptions, ipAddress)
+	if epInfo.Data[CnetAddressSpace] != nil {
+		if cnetAddressSpace := epInfo.Data[CnetAddressSpace].([]string); cnetAddressSpace != nil {
+			for _, ipAddress := range cnetAddressSpace {
+				outBoundNatPolicy.Exceptions = append(outBoundNatPolicy.Exceptions, ipAddress)
+			}
 		}
 	}
 
