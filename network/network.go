@@ -5,6 +5,7 @@ package network
 
 import (
 	"net"
+	"strings"
 
 	"github.com/Azure/azure-container-networking/log"
 	"github.com/Azure/azure-container-networking/network/policy"
@@ -149,8 +150,14 @@ func (nm *networkManager) newNetwork(nwInfo *NetworkInfo) (*network, error) {
 		nwInfo.Mode = opModeDefault
 	}
 
-	// Find the external interface by name.
-	extIf := nm.findExternalInterfaceByName(nwInfo.MasterIfName)
+	// If the master interface name is provided, find the external interface by name
+	// else use subnet to to find the interface
+	var extIf *externalInterface
+	if len(strings.TrimSpace(nwInfo.MasterIfName)) > 0 {
+		extIf = nm.findExternalInterfaceByName(nwInfo.MasterIfName)
+	} else {
+		extIf = nm.findExternalInterfaceBySubnet(nwInfo.Subnets[0].Prefix.String())
+	}
 	if extIf == nil {
 		err = errSubnetNotFound
 		return nil, err
