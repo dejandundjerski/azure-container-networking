@@ -2,7 +2,7 @@ package policy
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 const (
@@ -54,5 +54,6 @@ func GetOutBoundNatExceptionList(policies []Policy) ([]string, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("OutBoundNAT policy not set")
+	log.Printf("OutBoundNAT policy not set.")
+	return nil, nil
 }

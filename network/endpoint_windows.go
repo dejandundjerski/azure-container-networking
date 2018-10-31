@@ -73,8 +73,10 @@ func (nw *network) newEndpointImpl(epInfo *EndpointInfo) (*endpoint, error) {
 		return nil, err
 	}
 
-	for _, ipAddress := range exceptionList {
-		outBoundNatPolicy.Exceptions = append(outBoundNatPolicy.Exceptions, ipAddress)
+	if exceptionList != nil {
+		for _, ipAddress := range exceptionList {
+			outBoundNatPolicy.Exceptions = append(outBoundNatPolicy.Exceptions, ipAddress)
+		}
 	}
 
 	if epInfo.Data[CnetAddressSpace] != nil {
@@ -85,8 +87,10 @@ func (nw *network) newEndpointImpl(epInfo *EndpointInfo) (*endpoint, error) {
 		}
 	}
 
-	serializedOutboundNatPolicy, _ := json.Marshal(outBoundNatPolicy)
-	hnsEndpoint.Policies = append(hnsEndpoint.Policies, serializedOutboundNatPolicy)
+	if outBoundNatPolicy.Exceptions != nil {
+		serializedOutboundNatPolicy, _ := json.Marshal(outBoundNatPolicy)
+		hnsEndpoint.Policies = append(hnsEndpoint.Policies, serializedOutboundNatPolicy)
+	}
 
 	// HNS currently supports only one IP address per endpoint.
 	if epInfo.IPAddresses != nil {
