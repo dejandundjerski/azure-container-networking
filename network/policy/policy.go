@@ -27,7 +27,7 @@ func SerializePolicies(policyType CNIPolicyType, policies []Policy, epInfoData m
 	for _, policy := range policies {
 		if policy.Type == policyType {
 			if isPolicyTypeOutBoundNAT := IsPolicyTypeOutBoundNAT(policy); isPolicyTypeOutBoundNAT {
-				if serializedOutboundNatPolicy, err := SetOutBoundNATPolicy(policies, epInfoData); err == nil {
+				if serializedOutboundNatPolicy, err := SerializeOutBoundNATPolicy(policies, epInfoData); err == nil {
 					jsonPolicies = append(jsonPolicies, serializedOutboundNatPolicy)
 				}
 			} else {
@@ -87,8 +87,8 @@ func IsPolicyTypeOutBoundNAT(policy Policy) bool {
 	return false
 }
 
-// SetOutBoundNATPolicy formulates OutBoundNAT policy and returns serialized json
-func SetOutBoundNATPolicy(policies []Policy, epInfoData map[string]interface{}) (json.RawMessage, error) {
+// SerializeOutBoundNATPolicy formulates OutBoundNAT policy and returns serialized json
+func SerializeOutBoundNATPolicy(policies []Policy, epInfoData map[string]interface{}) (json.RawMessage, error) {
 	outBoundNatPolicy := hcsshim.OutboundNatPolicy{}
 	outBoundNatPolicy.Policy.Type = hcsshim.OutboundNat
 
