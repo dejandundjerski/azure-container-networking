@@ -73,11 +73,12 @@ func (client *LinuxBridgeEndpointClient) AddEndpointRules(epInfo *EndpointInfo) 
 			return err
 		}
 
-		log.Printf("[net] Adding static arp for IP address %v and MAC %v in VM", ipAddr.String(), client.containerMac.String())
-		netlink.AddOrRemoveStaticArp(netlink.ADD, client.bridgeName, ipAddr.IP, client.containerMac)
-		if err != nil {
-			log.Printf("Failed setting arp in vm: %v", err)
-			return err
+		if client.mode != opModeTunnel {
+			log.Printf("[net] Adding static arp for IP address %v and MAC %v in VM", ipAddr.String(), client.containerMac.String())
+			netlink.AddOrRemoveStaticArp(netlink.ADD, client.bridgeName, ipAddr.IP, client.containerMac)
+			if err != nil {
+				log.Printf("Failed setting arp in vm: %v", err)
+			}
 		}
 	}
 
@@ -107,10 +108,12 @@ func (client *LinuxBridgeEndpointClient) DeleteEndpointRules(ep *endpoint) {
 			log.Printf("[net] Failed to delete MAC DNAT rule for IP address %v: %v.", ipAddr.String(), err)
 		}
 
-		log.Printf("[net] Removing static arp for IP address %v and MAC %v from VM", ipAddr.String(), ep.MacAddress.String())
-		netlink.AddOrRemoveStaticArp(netlink.REMOVE, client.bridgeName, ipAddr.IP, ep.MacAddress)
-		if err != nil {
-			log.Printf("Failed removing arp from vm: %v", err)
+		if client.mode != opModeTunnel {
+			log.Printf("[net] Removing static arp for IP address %v and MAC %v from VM", ipAddr.String(), ep.MacAddress.String())
+			netlink.AddOrRemoveStaticArp(netlink.REMOVE, client.bridgeName, ipAddr.IP, ep.MacAddress)
+			if err != nil {
+				log.Printf("Failed removing arp from vm: %v", err)
+			}
 		}
 	}
 }
