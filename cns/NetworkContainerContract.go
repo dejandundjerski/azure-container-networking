@@ -17,6 +17,7 @@ const (
 	AzureContainerInstance = "AzureContainerInstance"
 	WebApps                = "WebApps"
 	ClearContainer         = "ClearContainer"
+	NetworkCompartment     = "NetworkCompartment"
 )
 
 // Orchestrator Types
@@ -50,6 +51,12 @@ type CreateNetworkContainerRequest struct {
 type KubernetesPodInfo struct {
 	PodName      string
 	PodNamespace string
+}
+
+// NetworkCompartmentInfo is an OrchestratorContext that holds Network compartment ID.
+type NetworkCompartmentInfo struct {
+	ID   string
+	Name string
 }
 
 // MultiTenancyInfo contains encap type and id.

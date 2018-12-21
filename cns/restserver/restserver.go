@@ -892,6 +892,19 @@ func (service *HTTPRestService) saveNetworkContainerGoalState(req cns.CreateNetw
 		default:
 			log.Printf("Invalid orchestrator type %v", service.state.OrchestratorType)
 		}
+	} else if req.NetworkContainerType == cns.NetworkCompartment {
+		switch service.state.OrchestratorType {
+		case cns.ServiceFabric:
+			if service.state.ContainerIDByOrchestratorContext == nil {
+				service.state.ContainerIDByOrchestratorContext = make(map[string]string)
+			}
+			log.Printf("[Azure CNS] Welcome network compartmnet")
+			service.state.ContainerIDByOrchestratorContext[req.NetworkContainerid] = req.NetworkContainerid
+			break
+
+		default:
+			log.Printf("Invalid orchestrator type %v", service.state.OrchestratorType)
+		}
 	}
 
 	service.saveState()
@@ -984,16 +997,27 @@ func (service *HTTPRestService) getNetworkContainerResponse(req cns.GetNetworkCo
 
 	switch service.state.OrchestratorType {
 	case cns.Kubernetes, cns.ServiceFabric:
+		var containerIdKey string
 		var podInfo cns.KubernetesPodInfo
+		var compartmentInfo cns.NetworkCompartmentInfo
+
 		err := json.Unmarshal(req.OrchestratorContext, &podInfo)
 		if err != nil {
-			getNetworkContainerResponse.Response.ReturnCode = UnexpectedError
-			getNetworkContainerResponse.Response.Message = fmt.Sprintf("Unmarshalling orchestrator context failed with error %v", err)
-			return getNetworkContainerResponse
+			err := json.Unmarshal(req.OrchestratorContext, &compartmentInfo)
+
+			if err != nil {
+				getNetworkContainerResponse.Response.ReturnCode = UnexpectedError
+				getNetworkContainerResponse.Response.Message = fmt.Sprintf("Unmarshalling orchestrator context failed with error %v", err)
+				return getNetworkContainerResponse
+			}
+			containerIdKey = compartmentInfo.ID
+			log.Printf("compartment info %+v", compartmentInfo)
+		} else {
+			containerIdKey = podInfo.PodName + podInfo.PodNamespace
+			log.Printf("pod info %+v", podInfo)
 		}
 
-		log.Printf("pod info %+v", podInfo)
-		containerID = service.state.ContainerIDByOrchestratorContext[podInfo.PodName+podInfo.PodNamespace]
+		containerID = service.state.ContainerIDByOrchestratorContext[containerIdKey]
 		log.Printf("containerid %v", containerID)
 		break
 

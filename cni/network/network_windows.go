@@ -124,6 +124,21 @@ func getNetworkName(podName, podNs, ifName string, nwCfg *cni.NetworkConfig) (st
 	return nwCfg.Name, nil
 }
 
+func getNetworkCompartmentName(ifName string, nwCfg *cni.NetworkConfig) (string, error) {
+	if nwCfg.MultiTenancy {
+		_, cnsNetworkConfig, _, err := getContainerNetworkConfiguration(nwCfg, "", "", "", ifName)
+		if err != nil {
+			log.Printf("GetContainerNetworkConfiguration failed for network compartment %v with error %v", ifName, err)
+			return "", err
+		}
+
+		networkName := fmt.Sprintf("%s-vlanid%v", nwCfg.Name, cnsNetworkConfig.MultiTenancyInfo.ID)
+		return networkName, nil
+	}
+
+	return nwCfg.Name, nil
+}
+
 func setupInfraVnetRoutingForMultitenancy(
 	nwCfg *cni.NetworkConfig,
 	azIpamResult *cniTypesCurr.Result,
