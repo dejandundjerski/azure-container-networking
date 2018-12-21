@@ -70,11 +70,16 @@ func getContainerNetworkConfigurationInternal(
 		return nil, nil, net.IPNet{}, err
 	}
 
-	podInfo := cns.KubernetesPodInfo{PodName: podName, PodNamespace: namespace}
-	orchestratorContext, err := json.Marshal(podInfo)
-	if err != nil {
-		log.Printf("Marshalling KubernetesPodInfo failed with %v", err)
-		return nil, nil, net.IPNet{}, err
+	if true /*k8s*/ {
+		podInfo := cns.KubernetesPodInfo{PodName: podName, PodNamespace: namespace}
+		orchestratorContext, err := json.Marshal(podInfo)
+		if err != nil {
+			log.Printf("Marshalling KubernetesPodInfo failed with %v", err)
+			return nil, nil, net.IPNet{}, err
+		}
+	} else if networkCompartment {
+		// populate for network compartment
+		// orchestratorContext, err := json.Marshal(netCompInfo)
 	}
 
 	networkConfig, err := cnsClient.GetNetworkConfiguration(orchestratorContext)

@@ -89,6 +89,7 @@ func setWeakHostOnInterface(ipAddress string) error {
 }
 
 func createOrUpdateWithOperation(createNetworkContainerRequest cns.CreateNetworkContainerRequest, operation string) error {
+	// In case we go with loopback adapters use this and pass additional parameters for network compartment
 	if _, err := os.Stat("./AzureNetworkContainer.exe"); err != nil {
 		if os.IsNotExist(err) {
 			return errors.New("[Azure CNS] Unable to find AzureNetworkContainer.exe. Cannot continue")
@@ -137,6 +138,7 @@ func createOrUpdateWithOperation(createNetworkContainerRequest cns.CreateNetwork
 }
 
 func deleteInterface(networkContainerID string) error {
+	// extend this call with network compartment stuff so that removal in case we go with this approach is done for net compartments as well
 
 	if _, err := os.Stat("./AzureNetworkContainer.exe"); err != nil {
 		if os.IsNotExist(err) {
